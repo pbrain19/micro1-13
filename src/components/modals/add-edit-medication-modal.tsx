@@ -144,6 +144,19 @@ export default function AddEditMedicationModal({
             />
             <FormField
               control={form.control}
+              name="doctorName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Doctor Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Dr. John Doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="medicationName"
               render={({ field }) => (
                 <FormItem>

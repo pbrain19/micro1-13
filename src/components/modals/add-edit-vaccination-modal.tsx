@@ -119,6 +119,8 @@ export default function AddEditVaccinationModal({
     });
   };
 
+  console.log(form.formState.errors);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
@@ -166,6 +168,19 @@ export default function AddEditVaccinationModal({
                       placeholder="Additional information about the vaccination"
                       {...field}
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="doctorName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Doctor Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Dr. John Doe" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
