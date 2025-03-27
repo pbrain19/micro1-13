@@ -163,12 +163,11 @@ export default function AddEditVaccinationModal({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Date & Time</FormLabel>
-                  <FormControl>
-                    <DateTimePickerForm
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  </FormControl>
+                  <DateTimePickerForm
+                    value={field.value}
+                    onChange={field.onChange}
+                    minDate={new Date()}
+                  />
                   <FormMessage />
                 </FormItem>
               )}

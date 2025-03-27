@@ -115,21 +115,21 @@ export default function PetHealthTracker() {
         <TabsList className="grid grid-cols-3 mb-4">
           <TabsTrigger
             value="vaccinations"
-            className="flex items-center justify-center"
+            className="flex items-center justify-center max-sm:w-[95px]"
           >
             <Syringe className="h-4 w-4 sm:mr-2 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">Vaccinations</span>
           </TabsTrigger>
           <TabsTrigger
             value="medications"
-            className="flex items-center justify-center"
+            className="flex items-center justify-center max-sm:w-[95px]"
           >
             <Pill className="h-4 w-4 sm:mr-2 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">Medications</span>
           </TabsTrigger>
           <TabsTrigger
             value="appointments"
-            className="flex items-center justify-center"
+            className="flex items-center justify-center max-sm:w-[95px]"
           >
             <Calendar className="h-4 w-4 sm:mr-2 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">Appointments</span>

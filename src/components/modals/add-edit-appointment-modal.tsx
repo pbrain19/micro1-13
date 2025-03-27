@@ -166,6 +166,7 @@ export default function AddEditAppointmentModal({
                     <DateTimePickerForm
                       value={field.value}
                       onChange={field.onChange}
+                      minDate={new Date()}
                     />
                   </FormControl>
                   <FormMessage />
