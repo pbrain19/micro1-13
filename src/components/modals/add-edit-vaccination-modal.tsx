@@ -94,9 +94,7 @@ export default function AddEditVaccinationModal({
         doctorName: "",
       });
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vaccination, open]);
+  }, [vaccination, form, open]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     // Combine date and time

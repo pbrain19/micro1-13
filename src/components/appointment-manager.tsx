@@ -97,7 +97,7 @@ export default function AppointmentManager({
   };
 
   return (
-    <Card>
+    <Card className="max-sm:gap-2">
       <CardHeader className="flex flex-row max-sm:flex-col items-center justify-between max-sm:p-4">
         <CardTitle className="max-sm:mb-4">Appointment Schedule</CardTitle>
         <Button
@@ -138,7 +138,7 @@ export default function AppointmentManager({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute top-2.5 right-12 z-10"
+                    className="absolute bottom-2.5 right-2 z-10"
                     onClick={(e) => handleDeleteClick(appointment.id, e)}
                     aria-label="Delete appointment"
                   >
