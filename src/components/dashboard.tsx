@@ -16,6 +16,7 @@ import { useState } from "react";
 import AddEditVaccinationModal from "./modals/add-edit-vaccination-modal";
 import AddEditMedicationModal from "./modals/add-edit-medication-modal";
 import AddEditAppointmentModal from "./modals/add-edit-appointment-modal";
+import { toast } from "sonner";
 
 interface DashboardProps {
   vaccinations: VaccinationSchedule[];
@@ -90,6 +91,9 @@ export default function Dashboard({
         ...vaccination,
         isComplete,
       });
+      toast.success(
+        `Vaccination marked as ${isComplete ? "complete" : "incomplete"}`
+      );
     }
   };
 
@@ -100,6 +104,9 @@ export default function Dashboard({
         ...medication,
         isComplete,
       });
+      toast.success(
+        `Medication marked as ${isComplete ? "complete" : "incomplete"}`
+      );
     }
   };
 
@@ -110,6 +117,9 @@ export default function Dashboard({
         ...appointment,
         isComplete,
       });
+      toast.success(
+        `Appointment marked as ${isComplete ? "complete" : "incomplete"}`
+      );
     }
   };
 

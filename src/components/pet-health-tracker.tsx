@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Toaster } from "sonner";
 import Dashboard from "@/components/dashboard";
 import VaccinationManager from "@/components/vaccination-manager";
 import MedicationManager from "@/components/medication-manager";
@@ -164,8 +163,6 @@ export default function PetHealthTracker() {
           />
         </TabsContent>
       </Tabs>
-
-      <Toaster position="top-right" />
     </div>
   );
 }
