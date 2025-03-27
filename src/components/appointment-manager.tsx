@@ -70,9 +70,12 @@ export default function AppointmentManager({
   console.log("here");
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Appointment Schedule</CardTitle>
-        <Button onClick={() => setIsAddModalOpen(true)}>
+      <CardHeader className="flex flex-row max-sm:flex-col items-center justify-between">
+        <CardTitle className="max-sm:mb-4">Appointment Schedule</CardTitle>
+        <Button
+          onClick={() => setIsAddModalOpen(true)}
+          className="max-sm:w-full"
+        >
           <Plus className="mr-2 h-4 w-4" />
           Add Appointment
         </Button>

@@ -7,6 +7,7 @@ import Dashboard from "@/components/dashboard";
 import VaccinationManager from "@/components/vaccination-manager";
 import MedicationManager from "@/components/medication-manager";
 import AppointmentManager from "@/components/appointment-manager";
+import { Syringe, Pill, Calendar } from "lucide-react";
 import type {
   VaccinationSchedule,
   MedicationSchedule,
@@ -113,9 +114,27 @@ export default function PetHealthTracker() {
 
       <Tabs defaultValue="vaccinations" className="w-full">
         <TabsList className="grid grid-cols-3 mb-4">
-          <TabsTrigger value="vaccinations">Vaccinations</TabsTrigger>
-          <TabsTrigger value="medications">Medications</TabsTrigger>
-          <TabsTrigger value="appointments">Appointments</TabsTrigger>
+          <TabsTrigger
+            value="vaccinations"
+            className="flex items-center justify-center"
+          >
+            <Syringe className="h-4 w-4 sm:mr-2 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Vaccinations</span>
+          </TabsTrigger>
+          <TabsTrigger
+            value="medications"
+            className="flex items-center justify-center"
+          >
+            <Pill className="h-4 w-4 sm:mr-2 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Medications</span>
+          </TabsTrigger>
+          <TabsTrigger
+            value="appointments"
+            className="flex items-center justify-center"
+          >
+            <Calendar className="h-4 w-4 sm:mr-2 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Appointments</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="vaccinations">

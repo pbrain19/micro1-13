@@ -1,68 +1,81 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import type { VaccinationSchedule } from "@/lib/types"
-import { Calendar, Edit, Plus, Trash2 } from "lucide-react"
-import { toast } from "sonner"
-import { formatDate } from "@/lib/utils"
-import AddEditVaccinationModal from "@/components/modals/add-edit-vaccination-modal"
-import DeleteConfirmationModal from "@/components/modals/delete-confirmation-modal"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import type { VaccinationSchedule } from "@/lib/types";
+import { Calendar, Edit, Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { formatDate } from "@/lib/utils";
+import AddEditVaccinationModal from "@/components/modals/add-edit-vaccination-modal";
+import DeleteConfirmationModal from "@/components/modals/delete-confirmation-modal";
 
 interface VaccinationManagerProps {
-  vaccinations: VaccinationSchedule[]
-  onAdd: (vaccination: VaccinationSchedule) => void
-  onUpdate: (vaccination: VaccinationSchedule) => void
-  onDelete: (id: string) => void
+  vaccinations: VaccinationSchedule[];
+  onAdd: (vaccination: VaccinationSchedule) => void;
+  onUpdate: (vaccination: VaccinationSchedule) => void;
+  onDelete: (id: string) => void;
 }
 
-export default function VaccinationManager({ vaccinations, onAdd, onUpdate, onDelete }: VaccinationManagerProps) {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [currentVaccination, setCurrentVaccination] = useState<VaccinationSchedule | null>(null)
+export default function VaccinationManager({
+  vaccinations,
+  onAdd,
+  onUpdate,
+  onDelete,
+}: VaccinationManagerProps) {
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [currentVaccination, setCurrentVaccination] =
+    useState<VaccinationSchedule | null>(null);
 
   const handleAdd = (vaccination: VaccinationSchedule) => {
     onAdd({
       ...vaccination,
       id: crypto.randomUUID(),
-    })
-    setIsAddModalOpen(false)
-    toast.success("Vaccination added successfully")
-  }
+    });
+    setIsAddModalOpen(false);
+    toast.success("Vaccination added successfully");
+  };
 
   const handleEdit = (vaccination: VaccinationSchedule) => {
-    setCurrentVaccination(vaccination)
-    setIsEditModalOpen(true)
-  }
+    setCurrentVaccination(vaccination);
+    setIsEditModalOpen(true);
+  };
 
   const handleUpdate = (vaccination: VaccinationSchedule) => {
-    onUpdate(vaccination)
-    setIsEditModalOpen(false)
-    toast.success("Vaccination updated successfully")
-  }
+    onUpdate(vaccination);
+    setIsEditModalOpen(false);
+    toast.success("Vaccination updated successfully");
+  };
 
   const handleDelete = (id: string) => {
-    onDelete(id)
-    setIsDeleteModalOpen(false)
-    toast.success("Vaccination deleted successfully")
-  }
+    onDelete(id);
+    setIsDeleteModalOpen(false);
+    toast.success("Vaccination deleted successfully");
+  };
 
   const handleToggleComplete = (vaccination: VaccinationSchedule) => {
     onUpdate({
       ...vaccination,
       isComplete: !vaccination.isComplete,
-    })
-    toast.success(`Vaccination marked as ${vaccination.isComplete ? "incomplete" : "complete"}`)
-  }
+    });
+    toast.success(
+      `Vaccination marked as ${
+        vaccination.isComplete ? "incomplete" : "complete"
+      }`
+    );
+  };
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Vaccination Schedule</CardTitle>
-        <Button onClick={() => setIsAddModalOpen(true)}>
+      <CardHeader className="flex flex-row max-sm:flex-col items-center justify-between">
+        <CardTitle className="max-sm:mb-4">Vaccination Schedule</CardTitle>
+        <Button
+          onClick={() => setIsAddModalOpen(true)}
+          className="max-sm:w-full"
+        >
           <Plus className="mr-2 h-4 w-4" />
           Add Vaccination
         </Button>
@@ -70,12 +83,17 @@ export default function VaccinationManager({ vaccinations, onAdd, onUpdate, onDe
       <CardContent>
         {vaccinations.length === 0 ? (
           <div className="text-center py-6">
-            <p className="text-muted-foreground">No vaccinations scheduled. Add one to get started.</p>
+            <p className="text-muted-foreground">
+              No vaccinations scheduled. Add one to get started.
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
             {vaccinations
-              .sort((a, b) => a.dateToAdminister.getTime() - b.dateToAdminister.getTime())
+              .sort(
+                (a, b) =>
+                  a.dateToAdminister.getTime() - b.dateToAdminister.getTime()
+              )
               .map((vaccination) => (
                 <div
                   key={vaccination.id}
@@ -91,11 +109,17 @@ export default function VaccinationManager({ vaccinations, onAdd, onUpdate, onDe
                     />
                     <div>
                       <h3
-                        className={`font-medium ${vaccination.isComplete ? "line-through text-muted-foreground" : ""}`}
+                        className={`font-medium ${
+                          vaccination.isComplete
+                            ? "line-through text-muted-foreground"
+                            : ""
+                        }`}
                       >
                         {vaccination.title}
                       </h3>
-                      <p className="text-sm text-muted-foreground">{vaccination.medicationName}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {vaccination.medicationName}
+                      </p>
                       <p className="text-sm mt-1">{vaccination.details}</p>
                       <div className="flex items-center mt-2 text-sm">
                         <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -104,15 +128,19 @@ export default function VaccinationManager({ vaccinations, onAdd, onUpdate, onDe
                     </div>
                   </div>
                   <div className="flex space-x-2">
-                    <Button variant="ghost" size="icon" onClick={() => handleEdit(vaccination)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleEdit(vaccination)}
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => {
-                        setCurrentVaccination(vaccination)
-                        setIsDeleteModalOpen(true)
+                        setCurrentVaccination(vaccination);
+                        setIsDeleteModalOpen(true);
                       }}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -125,7 +153,11 @@ export default function VaccinationManager({ vaccinations, onAdd, onUpdate, onDe
       </CardContent>
 
       {/* Add Modal */}
-      <AddEditVaccinationModal open={isAddModalOpen} onOpenChange={setIsAddModalOpen} onSave={handleAdd} />
+      <AddEditVaccinationModal
+        open={isAddModalOpen}
+        onOpenChange={setIsAddModalOpen}
+        onSave={handleAdd}
+      />
 
       {/* Edit Modal */}
       {currentVaccination && (
@@ -148,6 +180,5 @@ export default function VaccinationManager({ vaccinations, onAdd, onUpdate, onDe
         />
       )}
     </Card>
-  )
+  );
 }
-

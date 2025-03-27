@@ -183,12 +183,12 @@ export default function AddEditAppointmentModal({
                 </FormItem>
               )}
             />
-            <div className="flex flex-row justify-between">
+            <div className="flex min-sm:flex-row flex-col justify-between ">
               <FormField
                 control={form.control}
                 name="dateToAdminister"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
+                  <FormItem className="flex flex-col max-sm:mb-4 mb-0 ">
                     <FormLabel>Date</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>

@@ -183,12 +183,12 @@ export default function AddEditMedicationModal({
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-2 gap-4">
+            <div className="flex min-sm:flex-row flex-col justify-between ">
               <FormField
                 control={form.control}
                 name="dateToAdminister"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
+                  <FormItem className="flex flex-col max-sm:mb-4 mb-0 ">
                     <FormLabel>Date</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
@@ -214,7 +214,6 @@ export default function AddEditMedicationModal({
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          initialFocus
                         />
                       </PopoverContent>
                     </Popover>
