@@ -3,13 +3,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import type { MedicationSchedule } from "@/lib/types";
-import { Calendar, Edit, Plus, Trash2 } from "lucide-react";
+import { Plus, Pill, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { formatDate } from "@/lib/utils";
 import AddEditMedicationModal from "@/components/modals/add-edit-medication-modal";
 import DeleteConfirmationModal from "@/components/modals/delete-confirmation-modal";
+import MedicalCard from "@/components/medical-card";
 
 interface MedicationManagerProps {
   medications: MedicationSchedule[];
@@ -39,9 +38,12 @@ export default function MedicationManager({
     toast.success("Medication added successfully");
   };
 
-  const handleEdit = (medication: MedicationSchedule) => {
-    setCurrentMedication(medication);
-    setIsEditModalOpen(true);
+  const handleEdit = (id: string) => {
+    const medication = medications.find((m) => m.id === id);
+    if (medication) {
+      setCurrentMedication(medication);
+      setIsEditModalOpen(true);
+    }
   };
 
   const handleUpdate = (medication: MedicationSchedule) => {
@@ -56,21 +58,31 @@ export default function MedicationManager({
     toast.success("Medication deleted successfully");
   };
 
-  const handleToggleComplete = (medication: MedicationSchedule) => {
-    onUpdate({
-      ...medication,
-      isComplete: !medication.isComplete,
-    });
-    toast.success(
-      `Medication marked as ${
-        medication.isComplete ? "incomplete" : "complete"
-      }`
-    );
+  const handleToggleComplete = (id: string, isComplete: boolean) => {
+    const medication = medications.find((m) => m.id === id);
+    if (medication) {
+      onUpdate({
+        ...medication,
+        isComplete,
+      });
+      toast.success(
+        `Medication marked as ${isComplete ? "complete" : "incomplete"}`
+      );
+    }
+  };
+
+  const handleDeleteClick = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent edit modal from opening
+    const medication = medications.find((m) => m.id === id);
+    if (medication) {
+      setCurrentMedication(medication);
+      setIsDeleteModalOpen(true);
+    }
   };
 
   return (
     <Card>
-      <CardHeader className="flex flex-row max-sm:flex-col items-center justify-between">
+      <CardHeader className="flex flex-row max-sm:flex-col items-center justify-between max-sm:p-4">
         <CardTitle className="max-sm:mb-4">Medication Schedule</CardTitle>
         <Button
           onClick={() => setIsAddModalOpen(true)}
@@ -80,7 +92,7 @@ export default function MedicationManager({
           Add Medication
         </Button>
       </CardHeader>
-      <CardContent>
+      <CardContent className="max-sm:px-4">
         {medications.length === 0 ? (
           <div className="text-center py-6">
             <p className="text-muted-foreground">
@@ -95,57 +107,27 @@ export default function MedicationManager({
                   a.dateToAdminister.getTime() - b.dateToAdminister.getTime()
               )
               .map((medication) => (
-                <div
-                  key={medication.id}
-                  className={`flex items-start justify-between p-4 border rounded-lg ${
-                    medication.isComplete ? "bg-muted/50" : ""
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <Checkbox
-                      checked={medication.isComplete}
-                      onCheckedChange={() => handleToggleComplete(medication)}
-                      className="mt-1"
-                    />
-                    <div>
-                      <h3
-                        className={`font-medium ${
-                          medication.isComplete
-                            ? "line-through text-muted-foreground"
-                            : ""
-                        }`}
-                      >
-                        {medication.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {medication.medicationName}
-                      </p>
-                      <p className="text-sm mt-1">{medication.details}</p>
-                      <div className="flex items-center mt-2 text-sm">
-                        <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-                        {formatDate(medication.dateToAdminister)}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleEdit(medication)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {
-                        setCurrentMedication(medication);
-                        setIsDeleteModalOpen(true);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                <div key={medication.id} className="relative">
+                  <MedicalCard
+                    id={medication.id}
+                    header="Medication"
+                    title={medication.title}
+                    medicationName={medication.medicationName}
+                    dateToAdminister={medication.dateToAdminister}
+                    isComplete={medication.isComplete}
+                    icon={<Pill className="h-3.5 w-3.5" />}
+                    onEdit={handleEdit}
+                    onToggleComplete={handleToggleComplete}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2.5 right-12 z-10"
+                    onClick={(e) => handleDeleteClick(medication.id, e)}
+                    aria-label="Delete medication"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               ))}
           </div>

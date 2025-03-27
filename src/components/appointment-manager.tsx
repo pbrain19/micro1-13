@@ -3,13 +3,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import type { AppointmentSchedule } from "@/lib/types";
-import { Calendar, Edit, Plus, Trash2, User } from "lucide-react";
+import { Calendar, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { formatDate } from "@/lib/utils";
 import AddEditAppointmentModal from "@/components/modals/add-edit-appointment-modal";
 import DeleteConfirmationModal from "@/components/modals/delete-confirmation-modal";
+import MedicalCard from "@/components/medical-card";
 
 interface AppointmentManagerProps {
   appointments: AppointmentSchedule[];
@@ -39,9 +38,12 @@ export default function AppointmentManager({
     toast.success("Appointment added successfully");
   };
 
-  const handleEdit = (appointment: AppointmentSchedule) => {
-    setCurrentAppointment(appointment);
-    setIsEditModalOpen(true);
+  const handleEdit = (id: string) => {
+    const appointment = appointments.find((a) => a.id === id);
+    if (appointment) {
+      setCurrentAppointment(appointment);
+      setIsEditModalOpen(true);
+    }
   };
 
   const handleUpdate = (appointment: AppointmentSchedule) => {
@@ -56,21 +58,31 @@ export default function AppointmentManager({
     toast.success("Appointment deleted successfully");
   };
 
-  const handleToggleComplete = (appointment: AppointmentSchedule) => {
-    onUpdate({
-      ...appointment,
-      isComplete: !appointment.isComplete,
-    });
-    toast.success(
-      `Appointment marked as ${
-        appointment.isComplete ? "incomplete" : "complete"
-      }`
-    );
+  const handleToggleComplete = (id: string, isComplete: boolean) => {
+    const appointment = appointments.find((a) => a.id === id);
+    if (appointment) {
+      onUpdate({
+        ...appointment,
+        isComplete,
+      });
+      toast.success(
+        `Appointment marked as ${isComplete ? "complete" : "incomplete"}`
+      );
+    }
   };
-  console.log("here");
+
+  const handleDeleteClick = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent edit modal from opening
+    const appointment = appointments.find((a) => a.id === id);
+    if (appointment) {
+      setCurrentAppointment(appointment);
+      setIsDeleteModalOpen(true);
+    }
+  };
+
   return (
     <Card>
-      <CardHeader className="flex flex-row max-sm:flex-col items-center justify-between">
+      <CardHeader className="flex flex-row max-sm:flex-col items-center justify-between max-sm:p-4">
         <CardTitle className="max-sm:mb-4">Appointment Schedule</CardTitle>
         <Button
           onClick={() => setIsAddModalOpen(true)}
@@ -95,58 +107,27 @@ export default function AppointmentManager({
                   a.dateToAdminister.getTime() - b.dateToAdminister.getTime()
               )
               .map((appointment) => (
-                <div
-                  key={appointment.id}
-                  className={`flex items-start justify-between p-4 border rounded-lg ${
-                    appointment.isComplete ? "bg-muted/50" : ""
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <Checkbox
-                      checked={appointment.isComplete}
-                      onCheckedChange={() => handleToggleComplete(appointment)}
-                      className="mt-1"
-                    />
-                    <div>
-                      <h3
-                        className={`font-medium ${
-                          appointment.isComplete
-                            ? "line-through text-muted-foreground"
-                            : ""
-                        }`}
-                      >
-                        {appointment.title}
-                      </h3>
-                      <div className="flex items-center text-sm text-muted-foreground">
-                        <User className="mr-1 h-3 w-3" />
-                        {appointment.doctorName}
-                      </div>
-                      <p className="text-sm mt-1">{appointment.details}</p>
-                      <div className="flex items-center mt-2 text-sm">
-                        <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-                        {formatDate(appointment.dateToAdminister)}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleEdit(appointment)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {
-                        setCurrentAppointment(appointment);
-                        setIsDeleteModalOpen(true);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                <div key={appointment.id} className="relative">
+                  <MedicalCard
+                    id={appointment.id}
+                    header="Appointment"
+                    title={appointment.title}
+                    medicationName={`With ${appointment.doctorName}`}
+                    dateToAdminister={appointment.dateToAdminister}
+                    isComplete={appointment.isComplete}
+                    icon={<Calendar className="h-3.5 w-3.5" />}
+                    onEdit={handleEdit}
+                    onToggleComplete={handleToggleComplete}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2.5 right-12 z-10"
+                    onClick={(e) => handleDeleteClick(appointment.id, e)}
+                    aria-label="Delete appointment"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               ))}
           </div>

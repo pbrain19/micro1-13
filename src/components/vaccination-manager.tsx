@@ -3,13 +3,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import type { VaccinationSchedule } from "@/lib/types";
-import { Calendar, Edit, Plus, Trash2 } from "lucide-react";
+import { Plus, Syringe, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { formatDate } from "@/lib/utils";
 import AddEditVaccinationModal from "@/components/modals/add-edit-vaccination-modal";
 import DeleteConfirmationModal from "@/components/modals/delete-confirmation-modal";
+import MedicalCard from "@/components/medical-card";
 
 interface VaccinationManagerProps {
   vaccinations: VaccinationSchedule[];
@@ -39,9 +38,12 @@ export default function VaccinationManager({
     toast.success("Vaccination added successfully");
   };
 
-  const handleEdit = (vaccination: VaccinationSchedule) => {
-    setCurrentVaccination(vaccination);
-    setIsEditModalOpen(true);
+  const handleEdit = (id: string) => {
+    const vaccination = vaccinations.find((v) => v.id === id);
+    if (vaccination) {
+      setCurrentVaccination(vaccination);
+      setIsEditModalOpen(true);
+    }
   };
 
   const handleUpdate = (vaccination: VaccinationSchedule) => {
@@ -56,21 +58,31 @@ export default function VaccinationManager({
     toast.success("Vaccination deleted successfully");
   };
 
-  const handleToggleComplete = (vaccination: VaccinationSchedule) => {
-    onUpdate({
-      ...vaccination,
-      isComplete: !vaccination.isComplete,
-    });
-    toast.success(
-      `Vaccination marked as ${
-        vaccination.isComplete ? "incomplete" : "complete"
-      }`
-    );
+  const handleToggleComplete = (id: string, isComplete: boolean) => {
+    const vaccination = vaccinations.find((v) => v.id === id);
+    if (vaccination) {
+      onUpdate({
+        ...vaccination,
+        isComplete,
+      });
+      toast.success(
+        `Vaccination marked as ${isComplete ? "complete" : "incomplete"}`
+      );
+    }
+  };
+
+  const handleDeleteClick = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent edit modal from opening
+    const vaccination = vaccinations.find((v) => v.id === id);
+    if (vaccination) {
+      setCurrentVaccination(vaccination);
+      setIsDeleteModalOpen(true);
+    }
   };
 
   return (
     <Card>
-      <CardHeader className="flex flex-row max-sm:flex-col items-center justify-between">
+      <CardHeader className="flex flex-row max-sm:flex-col items-center justify-between max-sm:p-4">
         <CardTitle className="max-sm:mb-4">Vaccination Schedule</CardTitle>
         <Button
           onClick={() => setIsAddModalOpen(true)}
@@ -95,57 +107,27 @@ export default function VaccinationManager({
                   a.dateToAdminister.getTime() - b.dateToAdminister.getTime()
               )
               .map((vaccination) => (
-                <div
-                  key={vaccination.id}
-                  className={`flex items-start justify-between p-4 border rounded-lg ${
-                    vaccination.isComplete ? "bg-muted/50" : ""
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <Checkbox
-                      checked={vaccination.isComplete}
-                      onCheckedChange={() => handleToggleComplete(vaccination)}
-                      className="mt-1"
-                    />
-                    <div>
-                      <h3
-                        className={`font-medium ${
-                          vaccination.isComplete
-                            ? "line-through text-muted-foreground"
-                            : ""
-                        }`}
-                      >
-                        {vaccination.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {vaccination.medicationName}
-                      </p>
-                      <p className="text-sm mt-1">{vaccination.details}</p>
-                      <div className="flex items-center mt-2 text-sm">
-                        <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-                        {formatDate(vaccination.dateToAdminister)}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleEdit(vaccination)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {
-                        setCurrentVaccination(vaccination);
-                        setIsDeleteModalOpen(true);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                <div key={vaccination.id} className="relative">
+                  <MedicalCard
+                    id={vaccination.id}
+                    header="Vaccination"
+                    title={vaccination.title}
+                    medicationName={vaccination.medicationName}
+                    dateToAdminister={vaccination.dateToAdminister}
+                    isComplete={vaccination.isComplete}
+                    icon={<Syringe className="h-3.5 w-3.5" />}
+                    onEdit={handleEdit}
+                    onToggleComplete={handleToggleComplete}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2.5 right-12 z-10"
+                    onClick={(e) => handleDeleteClick(vaccination.id, e)}
+                    aria-label="Delete vaccination"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               ))}
           </div>
