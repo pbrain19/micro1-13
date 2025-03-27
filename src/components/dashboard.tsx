@@ -17,6 +17,7 @@ import AddEditVaccinationModal from "./modals/add-edit-vaccination-modal";
 import AddEditMedicationModal from "./modals/add-edit-medication-modal";
 import AddEditAppointmentModal from "./modals/add-edit-appointment-modal";
 import { toast } from "sonner";
+import { startOfWeek, endOfWeek, addWeeks, isWithinInterval } from "date-fns";
 
 interface DashboardProps {
   vaccinations: VaccinationSchedule[];
@@ -47,6 +48,68 @@ export default function Dashboard({
     useState<MedicationSchedule | null>(null);
   const [editingAppointment, setEditingAppointment] =
     useState<AppointmentSchedule | null>(null);
+
+  // Get this week's and next week's date ranges
+  const thisWeekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+  const thisWeekEnd = endOfWeek(new Date(), { weekStartsOn: 1 });
+  const nextWeekStart = addWeeks(thisWeekStart, 1);
+  const nextWeekEnd = addWeeks(thisWeekEnd, 1);
+
+  // Count events for this week
+  const thisWeekVaccinations = vaccinations.filter(
+    (v) =>
+      !v.isComplete &&
+      isWithinInterval(v.dateToAdminister, {
+        start: thisWeekStart,
+        end: thisWeekEnd,
+      })
+  ).length;
+
+  const thisWeekMedications = medications.filter(
+    (m) =>
+      !m.isComplete &&
+      isWithinInterval(m.dateToAdminister, {
+        start: thisWeekStart,
+        end: thisWeekEnd,
+      })
+  ).length;
+
+  const thisWeekAppointments = appointments.filter(
+    (a) =>
+      !a.isComplete &&
+      isWithinInterval(a.dateToAdminister, {
+        start: thisWeekStart,
+        end: thisWeekEnd,
+      })
+  ).length;
+
+  // Count events for next week
+  const nextWeekVaccinations = vaccinations.filter(
+    (v) =>
+      !v.isComplete &&
+      isWithinInterval(v.dateToAdminister, {
+        start: nextWeekStart,
+        end: nextWeekEnd,
+      })
+  ).length;
+
+  const nextWeekMedications = medications.filter(
+    (m) =>
+      !m.isComplete &&
+      isWithinInterval(m.dateToAdminister, {
+        start: nextWeekStart,
+        end: nextWeekEnd,
+      })
+  ).length;
+
+  const nextWeekAppointments = appointments.filter(
+    (a) =>
+      !a.isComplete &&
+      isWithinInterval(a.dateToAdminister, {
+        start: nextWeekStart,
+        end: nextWeekEnd,
+      })
+  ).length;
 
   // Combine and sort all upcoming events
   const upcomingEvents: UpcomingEvent[] = [
@@ -129,6 +192,70 @@ export default function Dashboard({
 
   return (
     <>
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 mb-4">
+        <Card className=" max-sm:gap-2 max-sm:py-2">
+          <CardHeader className="px-4 py-0 sm:px-6 max-sm:py-0">
+            <CardTitle className="text-lg">This Week</CardTitle>
+          </CardHeader>
+          <CardContent className="px-4 py-2 sm:px-6">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Syringe className="h-4 w-4 text-muted-foreground" />
+                  <span>Vaccinations</span>
+                </div>
+                <span className="font-medium">{thisWeekVaccinations}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Pill className="h-4 w-4 text-muted-foreground" />
+                  <span>Medications</span>
+                </div>
+                <span className="font-medium">{thisWeekMedications}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <span>Appointments</span>
+                </div>
+                <span className="font-medium">{thisWeekAppointments}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="max-sm:gap-2 max-sm:py-2">
+          <CardHeader className="px-4 py-0 sm:px-6 max-sm:py-0">
+            <CardTitle className="text-lg">Next Week</CardTitle>
+          </CardHeader>
+          <CardContent className="px-4 py-2 sm:px-6">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Syringe className="h-4 w-4 text-muted-foreground" />
+                  <span>Vaccinations</span>
+                </div>
+                <span className="font-medium">{nextWeekVaccinations}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Pill className="h-4 w-4 text-muted-foreground" />
+                  <span>Medications</span>
+                </div>
+                <span className="font-medium">{nextWeekMedications}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <span>Appointments</span>
+                </div>
+                <span className="font-medium">{nextWeekAppointments}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card className="max-sm:py-4 max-sm:gap-2">
         <CardHeader className="px-4 py-3 sm:px-6 max-sm:py-0">
           <CardTitle>Upcoming Health Events</CardTitle>
