@@ -53,9 +53,25 @@ export default function MedicationManager({
   };
 
   const handleDelete = (id: string) => {
+    // Find the medication's index before removing it
+    const medicationIndex = medications.findIndex((m) => m.id === id);
+    const medicationToDelete = medications[medicationIndex];
+
+    // Delete the medication
     onDelete(id);
     setIsDeleteModalOpen(false);
-    toast.success("Medication deleted successfully");
+
+    // Show toast with undo button
+    toast.success("Medication deleted", {
+      action: {
+        label: "Undo",
+        onClick: () => {
+          // Use onUpdate instead of onAdd to restore with same ID
+          onUpdate(medicationToDelete);
+          toast.success("Medication restored");
+        },
+      },
+    });
   };
 
   const handleToggleComplete = (id: string, isComplete: boolean) => {

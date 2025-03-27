@@ -53,9 +53,25 @@ export default function VaccinationManager({
   };
 
   const handleDelete = (id: string) => {
+    // Find the vaccination's index before removing it
+    const vaccinationIndex = vaccinations.findIndex((v) => v.id === id);
+    const vaccinationToDelete = vaccinations[vaccinationIndex];
+
+    // Delete the vaccination
     onDelete(id);
     setIsDeleteModalOpen(false);
-    toast.success("Vaccination deleted successfully");
+
+    // Show toast with undo button
+    toast.success("Vaccination deleted", {
+      action: {
+        label: "Undo",
+        onClick: () => {
+          // Use onUpdate instead of onAdd to restore with same ID
+          onUpdate(vaccinationToDelete);
+          toast.success("Vaccination restored");
+        },
+      },
+    });
   };
 
   const handleToggleComplete = (id: string, isComplete: boolean) => {
@@ -92,7 +108,7 @@ export default function VaccinationManager({
           Add Vaccination
         </Button>
       </CardHeader>
-      <CardContent>
+      <CardContent className="max-sm:px-4">
         {vaccinations.length === 0 ? (
           <div className="text-center py-6">
             <p className="text-muted-foreground">

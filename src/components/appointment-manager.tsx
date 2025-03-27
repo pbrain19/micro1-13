@@ -53,9 +53,25 @@ export default function AppointmentManager({
   };
 
   const handleDelete = (id: string) => {
+    // Find the appointment's index before removing it
+    const appointmentIndex = appointments.findIndex((a) => a.id === id);
+    const appointmentToDelete = appointments[appointmentIndex];
+
+    // Delete the appointment
     onDelete(id);
     setIsDeleteModalOpen(false);
-    toast.success("Appointment deleted successfully");
+
+    // Show toast with undo button
+    toast.success("Appointment deleted", {
+      action: {
+        label: "Undo",
+        onClick: () => {
+          // Use onUpdate instead of onAdd to restore with same ID
+          onUpdate(appointmentToDelete);
+          toast.success("Appointment restored");
+        },
+      },
+    });
   };
 
   const handleToggleComplete = (id: string, isComplete: boolean) => {
@@ -92,7 +108,7 @@ export default function AppointmentManager({
           Add Appointment
         </Button>
       </CardHeader>
-      <CardContent>
+      <CardContent className="max-sm:px-4">
         {appointments.length === 0 ? (
           <div className="text-center py-6">
             <p className="text-muted-foreground">
