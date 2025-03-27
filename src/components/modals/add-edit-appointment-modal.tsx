@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -60,29 +60,28 @@ export default function AddEditAppointmentModal({
   onSave,
   appointment,
 }: AddEditAppointmentModalProps) {
-  const [appointmentToEdit] = useState<AppointmentSchedule | null>(null);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: appointmentToEdit?.title || "",
-      medicationName: appointmentToEdit?.medicationName || "",
-      details: appointmentToEdit?.details || "",
-      dateToAdminister: appointmentToEdit?.dateToAdminister || new Date(),
-      timeToAdminister: appointmentToEdit?.dateToAdminister || new Date(),
-      doctorName: appointmentToEdit?.doctorName || "",
+      title: appointment?.title || "",
+      medicationName: appointment?.medicationName || "",
+      details: appointment?.details || "",
+      dateToAdminister: appointment?.dateToAdminister || new Date(),
+      timeToAdminister: appointment?.dateToAdminister || new Date(),
+      doctorName: appointment?.doctorName || "",
     },
   });
 
   useEffect(() => {
-    if (appointmentToEdit) {
-      const date = appointmentToEdit.dateToAdminister;
+    if (appointment) {
+      const date = appointment.dateToAdminister;
       form.reset({
-        title: appointmentToEdit.title,
-        medicationName: appointmentToEdit.medicationName,
-        details: appointmentToEdit.details,
+        title: appointment.title,
+        medicationName: appointment.medicationName,
+        details: appointment.details,
         dateToAdminister: date,
         timeToAdminister: date,
-        doctorName: appointmentToEdit.doctorName,
+        doctorName: appointment.doctorName,
       });
     } else {
       form.reset({
@@ -96,7 +95,7 @@ export default function AddEditAppointmentModal({
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appointmentToEdit]);
+  }, [appointment]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     // Combine date and time
@@ -149,19 +148,6 @@ export default function AddEditAppointmentModal({
                 <FormItem>
                   <FormLabel>Doctor Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Dr. Smith" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="doctorName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Doctor Name</FormLabel>
-                  <FormControl>
                     <Input placeholder="Dr. John Doe" {...field} />
                   </FormControl>
                   <FormMessage />
@@ -197,7 +183,7 @@ export default function AddEditAppointmentModal({
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-row justify-between">
               <FormField
                 control={form.control}
                 name="dateToAdminister"
@@ -228,7 +214,6 @@ export default function AddEditAppointmentModal({
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          initialFocus
                         />
                       </PopoverContent>
                     </Popover>

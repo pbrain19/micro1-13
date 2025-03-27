@@ -1,6 +1,7 @@
-import { Calendar } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
+import { Calendar, Check } from "lucide-react";
+import { Card } from "./ui/card";
 import { formatDate } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 type MedicalCardProps = {
   header: string;
@@ -8,6 +9,10 @@ type MedicalCardProps = {
   medicationName: string;
   dateToAdminister: Date;
   icon: React.ReactNode;
+  isComplete?: boolean;
+  id: string;
+  onEdit: (id: string) => void;
+  onToggleComplete: (id: string, isComplete: boolean) => void;
 };
 
 export default function MedicalCard({
@@ -16,27 +21,84 @@ export default function MedicalCard({
   medicationName,
   dateToAdminister,
   icon,
+  isComplete = false,
+  id,
+  onEdit,
+  onToggleComplete,
 }: MedicalCardProps) {
+  const handleCardClick = () => {
+    onEdit(id);
+  };
+
+  const handleCheckboxChange = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation(); // Prevent card click when clicking the checkbox
+    onToggleComplete(id, !isComplete);
+  };
+
   return (
-    <Card className="shadow-sm max-sm:gap-1 max-sm:py-2">
-      <CardHeader className="p-3 pb-1 sm:p-4 sm:pb-2 max-sm:py-1">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-sm sm:text-lg">
-            {icon}
-            {header}
-          </CardTitle>
+    <Card
+      className={cn(
+        "shadow-sm cursor-pointer transition-colors hover:bg-accent/50 max-sm:p-0 p-1",
+        isComplete && "bg-muted/50"
+      )}
+      onClick={handleCardClick}
+    >
+      <div className="p-2.5 max-sm:p-4">
+        {/* Row 1: Header with icon and checkbox */}
+        <div className="flex items-center justify-between mb-1.5">
+          <div className="flex items-center gap-1.5">
+            <span className="text-muted-foreground">{icon}</span>
+            <p className="font-medium text-sm">{header}</p>
+          </div>
+          <button
+            onClick={handleCheckboxChange}
+            className="h-5 w-5 flex items-center justify-center rounded border border-primary hover:bg-primary/10 focus:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            aria-label={isComplete ? "Mark as incomplete" : "Mark as complete"}
+          >
+            {isComplete && <Check className="h-3.5 w-3.5 text-primary" />}
+          </button>
         </div>
-      </CardHeader>
-      <CardContent className="p-3 pt-1 sm:p-4 sm:pt-2">
-        <h3 className="font-medium text-sm sm:text-base">{title}</h3>
-        <p className="text-xs sm:text-sm text-muted-foreground">
-          {medicationName}
-        </p>
-        <div className="mt-1 sm:mt-2 flex items-center text-xs sm:text-sm">
-          <Calendar className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
-          {formatDate(dateToAdminister)}
+
+        {/* Mobile layout: Each item on its own line */}
+        <div className="block max-sm:hidden space-y-1">
+          <p
+            className={cn(
+              "text-sm font-medium line-clamp-1",
+              isComplete && "line-through text-muted-foreground"
+            )}
+          >
+            {title}
+          </p>
+          <div className="flex items-center text-xs text-muted-foreground">
+            <Calendar className="mr-1 h-3 w-3" />
+            {formatDate(dateToAdminister)}
+          </div>
+          <p className="text-xs text-muted-foreground line-clamp-1">
+            {medicationName}
+          </p>
         </div>
-      </CardContent>
+
+        {/* Desktop layout: Title and medication on left, date on right */}
+        <div className="hidden max-sm:flex max-sm:flex-col justify-between items-start max-sm:space-y-1">
+          <div className="min-w-0 flex-1 max-sm:space-y-1 ">
+            <p
+              className={cn(
+                "text-sm font-medium truncate",
+                isComplete && "line-through text-muted-foreground"
+              )}
+            >
+              {title}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {medicationName}
+            </p>
+          </div>
+          <div className="flex items-center text-xs text-muted-foreground whitespace-nowrap ml-2 max-sm:ml-0 max-sm:mt-1">
+            <Calendar className="mr-1 h-3 w-3" />
+            {formatDate(dateToAdminister)}
+          </div>
+        </div>
+      </div>
     </Card>
   );
 }

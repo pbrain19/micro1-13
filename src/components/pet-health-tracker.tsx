@@ -106,6 +106,9 @@ export default function PetHealthTracker() {
         vaccinations={vaccinations}
         medications={medications}
         appointments={appointments}
+        onUpdateVaccination={handleUpdateVaccination}
+        onUpdateMedication={handleUpdateMedication}
+        onUpdateAppointment={handleUpdateAppointment}
       />
 
       <Tabs defaultValue="vaccinations" className="w-full">

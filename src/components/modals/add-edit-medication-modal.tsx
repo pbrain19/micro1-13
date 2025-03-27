@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -61,29 +61,28 @@ export default function AddEditMedicationModal({
   onSave,
   medication,
 }: AddEditMedicationModalProps) {
-  const [medicationToEdit] = useState<MedicationSchedule | null>(null);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: medicationToEdit?.title || "",
-      medicationName: medicationToEdit?.medicationName || "",
-      details: medicationToEdit?.details || "",
-      dateToAdminister: medicationToEdit?.dateToAdminister || new Date(),
-      timeToAdminister: medicationToEdit?.dateToAdminister || new Date(),
-      doctorName: medicationToEdit?.doctorName || "",
+      title: medication?.title || "",
+      medicationName: medication?.medicationName || "",
+      details: medication?.details || "",
+      dateToAdminister: medication?.dateToAdminister || new Date(),
+      timeToAdminister: medication?.dateToAdminister || new Date(),
+      doctorName: medication?.doctorName || "",
     },
   });
 
   useEffect(() => {
-    if (medicationToEdit) {
-      const date = medicationToEdit.dateToAdminister;
+    if (medication) {
+      const date = medication.dateToAdminister;
       form.reset({
-        title: medicationToEdit.title,
-        medicationName: medicationToEdit.medicationName,
-        details: medicationToEdit.details,
+        title: medication.title,
+        medicationName: medication.medicationName,
+        details: medication.details,
         dateToAdminister: date,
         timeToAdminister: date,
-        doctorName: medicationToEdit.doctorName,
+        doctorName: medication.doctorName,
       });
     } else {
       form.reset({
@@ -96,7 +95,7 @@ export default function AddEditMedicationModal({
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [medicationToEdit, open]);
+  }, [medication, open]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     // Combine date and time
@@ -109,7 +108,7 @@ export default function AddEditMedicationModal({
     );
 
     onSave({
-      id: medicationToEdit?.id || "",
+      id: medication?.id || "",
       title: values.title,
       medicationName: values.medicationName,
       details: values.details || "",
