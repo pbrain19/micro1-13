@@ -10,7 +10,7 @@ import type {
   MedicationSchedule,
   AppointmentSchedule,
 } from "@/lib/types";
-import { Pill, Syringe, User } from "lucide-react";
+import { Pill, Syringe, Calendar } from "lucide-react";
 import MedicalCard from "@/components/medical-card";
 import { useState } from "react";
 import AddEditVaccinationModal from "./modals/add-edit-vaccination-modal";
@@ -26,6 +26,11 @@ interface DashboardProps {
   onUpdateMedication: (medication: MedicationSchedule) => void;
   onUpdateAppointment: (appointment: AppointmentSchedule) => void;
 }
+
+type UpcomingEvent = {
+  type: "vaccination" | "medication" | "appointment";
+  data: VaccinationSchedule | MedicationSchedule | AppointmentSchedule;
+};
 
 export default function Dashboard({
   vaccinations,
@@ -43,24 +48,23 @@ export default function Dashboard({
   const [editingAppointment, setEditingAppointment] =
     useState<AppointmentSchedule | null>(null);
 
-  // Get the next upcoming item of each type (not completed and soonest date)
-  const nextVaccination = vaccinations
-    .filter((v) => !v.isComplete)
+  // Combine and sort all upcoming events
+  const upcomingEvents: UpcomingEvent[] = [
+    ...vaccinations
+      .filter((v) => !v.isComplete)
+      .map((v) => ({ type: "vaccination" as const, data: v })),
+    ...medications
+      .filter((m) => !m.isComplete)
+      .map((m) => ({ type: "medication" as const, data: m })),
+    ...appointments
+      .filter((a) => !a.isComplete)
+      .map((a) => ({ type: "appointment" as const, data: a })),
+  ]
     .sort(
-      (a, b) => a.dateToAdminister.getTime() - b.dateToAdminister.getTime()
-    )[0];
-
-  const nextMedication = medications
-    .filter((m) => !m.isComplete)
-    .sort(
-      (a, b) => a.dateToAdminister.getTime() - b.dateToAdminister.getTime()
-    )[0];
-
-  const nextAppointment = appointments
-    .filter((a) => !a.isComplete)
-    .sort(
-      (a, b) => a.dateToAdminister.getTime() - b.dateToAdminister.getTime()
-    )[0];
+      (a, b) =>
+        a.data.dateToAdminister.getTime() - b.data.dateToAdminister.getTime()
+    )
+    .slice(0, 3); // Only show the next 3 events
 
   // Handler functions
   const handleEditVaccination = (id: string) => {
@@ -134,49 +138,63 @@ export default function Dashboard({
         </CardHeader>
         <CardContent className="px-4 py-2 sm:px-6 sm:py-3">
           <div className="grid gap-2 sm:gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-            {nextVaccination && (
-              <MedicalCard
-                id={nextVaccination.id}
-                header="Next Vaccination"
-                title={nextVaccination.title}
-                medicationName={nextVaccination.medicationName}
-                dateToAdminister={nextVaccination.dateToAdminister}
-                isComplete={nextVaccination.isComplete}
-                icon={<Syringe className="h-3.5 w-3.5 text-muted-foreground" />}
-                onEdit={handleEditVaccination}
-                onToggleComplete={handleToggleVaccinationComplete}
-              />
-            )}
+            {upcomingEvents.map((event) => {
+              switch (event.type) {
+                case "vaccination":
+                  return (
+                    <MedicalCard
+                      key={event.data.id}
+                      id={event.data.id}
+                      header="Next Vaccination"
+                      title={event.data.title}
+                      medicationName={event.data.medicationName}
+                      dateToAdminister={event.data.dateToAdminister}
+                      isComplete={event.data.isComplete}
+                      icon={
+                        <Syringe className="h-3.5 w-3.5 text-muted-foreground" />
+                      }
+                      onEdit={handleEditVaccination}
+                      onToggleComplete={handleToggleVaccinationComplete}
+                    />
+                  );
+                case "medication":
+                  return (
+                    <MedicalCard
+                      key={event.data.id}
+                      id={event.data.id}
+                      header="Next Medication"
+                      title={event.data.title}
+                      medicationName={event.data.medicationName}
+                      dateToAdminister={event.data.dateToAdminister}
+                      isComplete={event.data.isComplete}
+                      icon={
+                        <Pill className="h-3.5 w-3.5 text-muted-foreground" />
+                      }
+                      onEdit={handleEditMedication}
+                      onToggleComplete={handleToggleMedicationComplete}
+                    />
+                  );
+                case "appointment":
+                  return (
+                    <MedicalCard
+                      key={event.data.id}
+                      id={event.data.id}
+                      header="Next Appointment"
+                      title={event.data.title}
+                      medicationName={event.data.doctorName}
+                      dateToAdminister={event.data.dateToAdminister}
+                      isComplete={event.data.isComplete}
+                      icon={
+                        <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                      }
+                      onEdit={handleEditAppointment}
+                      onToggleComplete={handleToggleAppointmentComplete}
+                    />
+                  );
+              }
+            })}
 
-            {nextMedication && (
-              <MedicalCard
-                id={nextMedication.id}
-                header="Next Medication"
-                title={nextMedication.title}
-                medicationName={nextMedication.medicationName}
-                dateToAdminister={nextMedication.dateToAdminister}
-                isComplete={nextMedication.isComplete}
-                icon={<Pill className="h-3.5 w-3.5 text-muted-foreground" />}
-                onEdit={handleEditMedication}
-                onToggleComplete={handleToggleMedicationComplete}
-              />
-            )}
-
-            {nextAppointment && (
-              <MedicalCard
-                id={nextAppointment.id}
-                header="Next Appointment"
-                title={nextAppointment.title}
-                medicationName={nextAppointment.doctorName}
-                dateToAdminister={nextAppointment.dateToAdminister}
-                isComplete={nextAppointment.isComplete}
-                icon={<User className="h-3.5 w-3.5 text-muted-foreground" />}
-                onEdit={handleEditAppointment}
-                onToggleComplete={handleToggleAppointmentComplete}
-              />
-            )}
-
-            {!nextVaccination && !nextMedication && !nextAppointment && (
+            {upcomingEvents.length === 0 && (
               <div className="col-span-full text-center py-4 sm:py-6">
                 <p className="text-muted-foreground">
                   No upcoming health events. Add some using the tabs below.

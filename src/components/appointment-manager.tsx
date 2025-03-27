@@ -97,8 +97,8 @@ export default function AppointmentManager({
   };
 
   return (
-    <Card className="max-sm:gap-2">
-      <CardHeader className="flex flex-row max-sm:flex-col items-center justify-between max-sm:p-4">
+    <Card className="max-sm:gap-2 max-sm:py-4 ">
+      <CardHeader className="flex flex-row max-sm:flex-col items-center justify-between max-sm:p-4  max-sm:pt-0">
         <CardTitle className="max-sm:mb-4">Appointment Schedule</CardTitle>
         <Button
           onClick={() => setIsAddModalOpen(true)}

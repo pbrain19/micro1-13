@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
   DialogContent,
@@ -20,19 +19,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import type { MedicationSchedule } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { cn } from "@/lib/utils";
-import { TimePickerDemo } from "@/components/time-picker";
+import { DateTimePickerForm } from "@/components/ui/date-time-picker";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -40,9 +31,6 @@ const formSchema = z.object({
   details: z.string().optional(),
   dateToAdminister: z.date({
     required_error: "Date is required",
-  }),
-  timeToAdminister: z.date({
-    required_error: "Time is required",
   }),
   doctorName: z.string().min(1, "Doctor name is required"),
   isComplete: z.boolean().optional(),
@@ -68,20 +56,17 @@ export default function AddEditMedicationModal({
       medicationName: medication?.medicationName || "",
       details: medication?.details || "",
       dateToAdminister: medication?.dateToAdminister || new Date(),
-      timeToAdminister: medication?.dateToAdminister || new Date(),
       doctorName: medication?.doctorName || "",
     },
   });
 
   useEffect(() => {
     if (medication) {
-      const date = medication.dateToAdminister;
       form.reset({
         title: medication.title,
         medicationName: medication.medicationName,
         details: medication.details,
-        dateToAdminister: date,
-        timeToAdminister: date,
+        dateToAdminister: medication.dateToAdminister,
         doctorName: medication.doctorName,
       });
     } else {
@@ -90,29 +75,18 @@ export default function AddEditMedicationModal({
         medicationName: "",
         details: "",
         dateToAdminister: new Date(),
-        timeToAdminister: new Date(),
         doctorName: "",
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [medication, open]);
+  }, [medication, form, open]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    // Combine date and time
-    const dateToAdminister = new Date(values.dateToAdminister);
-    const timeToAdminister = new Date(values.timeToAdminister);
-
-    dateToAdminister.setHours(
-      timeToAdminister.getHours(),
-      timeToAdminister.getMinutes()
-    );
-
     onSave({
-      id: medication?.id || "",
+      id: medication?.id || Math.random().toString(),
       title: values.title,
       medicationName: values.medicationName,
       details: values.details || "",
-      dateToAdminister,
+      dateToAdminister: values.dateToAdminister,
       isComplete: values.isComplete || false,
       doctorName: values.doctorName,
     });
@@ -183,61 +157,22 @@ export default function AddEditMedicationModal({
                 </FormItem>
               )}
             />
-            <div className="flex min-sm:flex-row flex-col justify-between ">
-              <FormField
-                control={form.control}
-                name="dateToAdminister"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col max-sm:mb-4 mb-0 ">
-                    <FormLabel>Date</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="timeToAdminister"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Time</FormLabel>
-                    <FormControl>
-                      <TimePickerDemo
-                        date={field.value}
-                        setDate={field.onChange}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="dateToAdminister"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Date & Time</FormLabel>
+                  <FormControl>
+                    <DateTimePickerForm
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <DialogFooter>
               <Button type="submit">Save</Button>
             </DialogFooter>
