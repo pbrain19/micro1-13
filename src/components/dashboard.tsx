@@ -1,101 +1,100 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import type { VaccinationSchedule, MedicationSchedule, AppointmentSchedule } from "@/lib/types"
-import { Calendar, Pill, Syringe, User } from "lucide-react"
-import { formatDate } from "@/lib/utils"
-
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import type {
+  VaccinationSchedule,
+  MedicationSchedule,
+  AppointmentSchedule,
+} from "@/lib/types";
+import { Pill, Syringe, User } from "lucide-react";
+import MedicalCard from "@/components/medical-card";
 interface DashboardProps {
-  vaccinations: VaccinationSchedule[]
-  medications: MedicationSchedule[]
-  appointments: AppointmentSchedule[]
+  vaccinations: VaccinationSchedule[];
+  medications: MedicationSchedule[];
+  appointments: AppointmentSchedule[];
 }
 
-export default function Dashboard({ vaccinations, medications, appointments }: DashboardProps) {
+export default function Dashboard({
+  vaccinations,
+  medications,
+  appointments,
+}: DashboardProps) {
   // Get the next upcoming item of each type (not completed and soonest date)
   const nextVaccination = vaccinations
     .filter((v) => !v.isComplete)
-    .sort((a, b) => a.dateToAdminister.getTime() - b.dateToAdminister.getTime())[0]
+    .sort(
+      (a, b) => a.dateToAdminister.getTime() - b.dateToAdminister.getTime()
+    )[0];
 
   const nextMedication = medications
     .filter((m) => !m.isComplete)
-    .sort((a, b) => a.dateToAdminister.getTime() - b.dateToAdminister.getTime())[0]
+    .sort(
+      (a, b) => a.dateToAdminister.getTime() - b.dateToAdminister.getTime()
+    )[0];
 
   const nextAppointment = appointments
     .filter((a) => !a.isComplete)
-    .sort((a, b) => a.dateToAdminister.getTime() - b.dateToAdminister.getTime())[0]
+    .sort(
+      (a, b) => a.dateToAdminister.getTime() - b.dateToAdminister.getTime()
+    )[0];
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="max-sm:py-4 max-sm:gap-2">
+      <CardHeader className="px-4 py-3 sm:px-6 max-sm:py-0">
         <CardTitle>Upcoming Health Events</CardTitle>
         <CardDescription>The next scheduled items for your pet</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="grid gap-4 md:grid-cols-3">
+      <CardContent className="px-4 py-2 sm:px-6 sm:py-3">
+        <div className="grid gap-2 sm:gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
           {nextVaccination && (
-            <Card>
-              <CardHeader className="p-4 pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">Next Vaccination</CardTitle>
-                  <Syringe className="h-5 w-5 text-muted-foreground" />
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 pt-2">
-                <h3 className="font-medium">{nextVaccination.title}</h3>
-                <p className="text-sm text-muted-foreground">{nextVaccination.medicationName}</p>
-                <div className="mt-2 flex items-center text-sm">
-                  <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-                  {formatDate(nextVaccination.dateToAdminister)}
-                </div>
-              </CardContent>
-            </Card>
+            <MedicalCard
+              header="Next Vaccination"
+              title={nextVaccination.title}
+              medicationName={nextVaccination.medicationName}
+              dateToAdminister={nextVaccination.dateToAdminister}
+              icon={
+                <Syringe className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+              }
+            />
           )}
 
           {nextMedication && (
-            <Card>
-              <CardHeader className="p-4 pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">Next Medication</CardTitle>
-                  <Pill className="h-5 w-5 text-muted-foreground" />
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 pt-2">
-                <h3 className="font-medium">{nextMedication.title}</h3>
-                <p className="text-sm text-muted-foreground">{nextMedication.medicationName}</p>
-                <div className="mt-2 flex items-center text-sm">
-                  <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-                  {formatDate(nextMedication.dateToAdminister)}
-                </div>
-              </CardContent>
-            </Card>
+            <MedicalCard
+              header="Next Medication"
+              title={nextMedication.title}
+              medicationName={nextMedication.medicationName}
+              dateToAdminister={nextMedication.dateToAdminister}
+              icon={
+                <Pill className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+              }
+            />
           )}
 
           {nextAppointment && (
-            <Card>
-              <CardHeader className="p-4 pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">Next Appointment</CardTitle>
-                  <User className="h-5 w-5 text-muted-foreground" />
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 pt-2">
-                <h3 className="font-medium">{nextAppointment.title}</h3>
-                <p className="text-sm text-muted-foreground">With {nextAppointment.doctorName}</p>
-                <div className="mt-2 flex items-center text-sm">
-                  <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-                  {formatDate(nextAppointment.dateToAdminister)}
-                </div>
-              </CardContent>
-            </Card>
+            <MedicalCard
+              header="Next Appointment"
+              title={nextAppointment.title}
+              medicationName={nextAppointment.medicationName}
+              dateToAdminister={nextAppointment.dateToAdminister}
+              icon={
+                <User className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+              }
+            />
           )}
 
           {!nextVaccination && !nextMedication && !nextAppointment && (
-            <div className="col-span-3 text-center py-6">
-              <p className="text-muted-foreground">No upcoming health events. Add some using the tabs below.</p>
+            <div className="col-span-full text-center py-4 sm:py-6">
+              <p className="text-muted-foreground">
+                No upcoming health events. Add some using the tabs below.
+              </p>
             </div>
           )}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
-
